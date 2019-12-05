@@ -1,4 +1,9 @@
 #!/bin/bash
+path=~/Downloads
+if [ ! -d "$DIRECTORY" ]; then
+  # Control will enter here if $DIRECTORY doesn't exist.
+    mkdir $path/savedUrls
+fi
 text=`/usr/bin/osascript << EOT
 -- NAME OF REPORT TITLE
 
@@ -7,7 +12,7 @@ set url_list to {}
 set the date_stamp to ((the current date) as string)
 set NoteTitle to "# " & the date_stamp
 set report_Title to do shell script "ruby -e 'puts Time.now.to_i'"
-set thePath to alias "Macintosh HD:Users:tyyiu:repos:urlLists:"
+set thePath to ((path to Downloads Folder) & "savedUrls") as string
 
 -- GET TABS FROM SAFARI
 set window_count to 1
@@ -38,9 +43,10 @@ set url_list to (NoteTitle & linefeed & linefeed & linefeed & url_list) as text
 return url_list
 EOT
 `
-dir=~/repos/urlLists
+dir=$path/savedUrls
 filename=$(date +%s)
 touch $dir/$filename.md
 echo $text | cat > $dir/$filename.md
 sed -i .bak 's/- \[/\'$'\n - \[/g' $dir/$filename.md
 sed -i .bak 's/##/\'$'\n##/g' $dir/$filename.md
+notification= osascript -e 'display notification "Markdown file generated" with title "Success"'
